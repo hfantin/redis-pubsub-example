@@ -1,8 +1,32 @@
-version: "3.8"
+version: "3.3"
 services:
   redis:
     image: redis:latest
     container_name: redis
     hostname: redis
     ports:
-      - '6379:6379'
+      - 6379:6379
+    networks:
+      - internal
+  db:
+    image: postgres:latest
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=test
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "111.111.10.0/24"
